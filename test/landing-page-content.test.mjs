@@ -77,6 +77,14 @@ test("uses consistent inline SVG theme icons and a custom-styled email field on 
   assert.match(page, /\.signup input\{[^}]*font:14px Manrope,Arial,sans-serif/);
 });
 
+test("keeps hero controls aligned and gives the two-column hero enough room", () => {
+  assert.match(page, /\.actions\{display:grid;grid-template-columns:minmax\(0,480px\) auto;align-items:start/);
+  assert.match(page, /\.quiet-link\{margin-top:23px\}/);
+  assert.match(page, /@media\(max-width:1200px\)\{\.hero\{grid-template-columns:1fr;gap:74px\}/);
+  assert.match(page, /\.hero \.product-frame\{max-width:760px;width:100%;margin:auto\}/);
+});
+
+
 test("offers an accessible seller dashboard preview alongside the buyer library", () => {
   assert.match(page, /class="preview-mode-toggle" role="group" aria-label="Preview mode"/);
   assert.match(page, /data-preview-mode="buyer"/);
