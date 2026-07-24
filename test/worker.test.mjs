@@ -73,13 +73,23 @@ test("stores a normalized waitlist address and sends its confirmation email", as
   assert.equal(sent.length, 1);
   assert.equal(sent[0].url, "https://api.resend.com/emails");
   assert.equal(sent[0].options.headers.Authorization, "Bearer re_test");
-  assert.deepEqual(JSON.parse(sent[0].options.body), {
+  const email = JSON.parse(sent[0].options.body);
+  assert.deepEqual({
+    from: email.from,
+    to: email.to,
+    subject: email.subject,
+    text: email.text,
+  }, {
     from: "Navolume <hello@navolume.com>",
     to: ["creator@example.com"],
     subject: "You’re on the Navolume early-access list",
     text: "You’re on the Navolume early-access list. We’ll be in touch.",
-    html: `<!doctype html><html lang="en"><body style="margin:0;background:#f7f6f2;color:#17191d;font-family:Arial,sans-serif"><main style="max-width:560px;margin:32px auto;padding:40px;background:#ffffff;border-radius:20px"><p style="margin:0 0 24px;color:#5b5f68;font-size:14px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Navolume</p><h1 style="margin:0 0 16px;font-size:32px;line-height:1.15">You’re on the list.</h1><p style="margin:0;font-size:18px;line-height:1.6">Thanks for joining Navolume early access. We’ll be in touch soon.</p></main></body></html>`,
   });
+  assert.match(email.html, /^<!doctype html>/i);
+  assert.match(email.html, /<table role="presentation"/);
+  assert.match(email.html, /You’re officially<br>on the list\./);
+  assert.match(email.html, /What’s next/);
+  assert.match(email.html, /background-color:#17211c/);
   assert.ok(WAITLIST_DB.statements.some((sql) => sql.startsWith("UPDATE waitlist_signups SET confirmation_sent_at")));
 });
 
