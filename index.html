@@ -39,6 +39,9 @@
     .product-frame{animation:preview-float 6s ease-in-out infinite}
     @media(prefers-reduced-motion:reduce){.hero>*,.product-frame{animation:none}}
     @media(prefers-reduced-motion:reduce){html.theme-transitioning,html.theme-transitioning *{transition:none}}
+    @media(max-width:800px){.shell{width:min(100% - 32px,1180px)}.hero{grid-template-columns:1fr;gap:74px;padding:76px 0 90px}.hero h1{max-width:9ch}.statement{grid-template-columns:1fr;gap:25px}.section-heading{display:block}.section-heading p{margin-top:22px}.principles,.product-type-grid,.workflow{grid-template-columns:1fr}.cta{display:block}.cta .button{margin-top:25px}}
+    @media(max-width:520px){.nav{height:72px}.nav-link{padding:10px 11px}.theme-toggle{padding:10px}.theme-toggle-label{display:none}.actions{display:block}.quiet-link{margin-top:12px}.signup-fields{display:flex;flex-direction:column}.signup .button{width:100%}.app-body{grid-template-columns:86px 1fr}.library{padding:17px}.preview-mode-toggle{right:8px}.product-frame{padding:10px;box-shadow:12px 14px 0 color-mix(in srgb,var(--lime) 10%,transparent)}footer{display:block;line-height:2}}
+    @media(prefers-reduced-motion:reduce){.hero>*,.product-frame{animation:none}}
     /* :root{--preview-surface:#10151c;--preview-text:#f3f1e9}:root[data-theme="light"]{--preview-surface:#e9ede6;--preview-text:#1a2520} */
   </style>
 </head>
