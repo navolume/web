@@ -23,3 +23,12 @@ test("smoothly transitions theme colors while respecting reduced-motion preferen
   assert.match(page, /classList\.add\('theme-transitioning'\)/);
   assert.match(page, /classList\.remove\('theme-transitioning'\)/);
 });
+
+test("uses consistent inline SVG theme icons and a custom-styled email field on mobile browsers", () => {
+  assert.match(page, /class="theme-icon theme-icon-moon"/);
+  assert.match(page, /class="theme-icon theme-icon-sun"/);
+  assert.doesNotMatch(page, /aria-hidden="true">☾/);
+  assert.match(page, /\.theme-icon\{width:16px;height:16px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1\.8\}/);
+  assert.match(page, /\.signup input\{[^}]*appearance:none;-webkit-appearance:none;/);
+  assert.match(page, /\.signup input\{[^}]*font:14px Manrope,Arial,sans-serif/);
+});
