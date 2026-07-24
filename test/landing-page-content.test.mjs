@@ -65,3 +65,18 @@ test("offers an accessible seller dashboard preview alongside the buyer library"
   assert.match(page, /previewModeButtons\.forEach/);
   assert.match(page, /sellerPreview\.hidden = mode !== 'seller'/);
 });
+
+test("supports keyboard navigation and visible focus in buyer-preview tabs", () => {
+  assert.match(page, /role="tablist" aria-orientation="vertical"/);
+  assert.match(page, /id="tab-library" tabindex="0"/);
+  assert.match(page, /id="tab-updates" tabindex="-1"/);
+  assert.match(page, /id="tab-receipts" tabindex="-1"/);
+  assert.match(page, /\.preview-tab:focus-visible\{[^}]*outline:2px solid var\(--lime\);outline-offset:2px/);
+  assert.match(page, /const activatePreviewTab = \(tab\) =>/);
+  assert.match(page, /item\.setAttribute\('tabindex', selected \? '0' : '-1'\)/);
+  assert.match(page, /\['ArrowDown', 'ArrowRight'\]/);
+  assert.match(page, /\['ArrowUp', 'ArrowLeft'\]/);
+  assert.match(page, /event\.key === 'Home'/);
+  assert.match(page, /event\.key === 'End'/);
+  assert.match(page, /nextTab\.focus\(\)/);
+});
