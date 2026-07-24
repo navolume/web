@@ -1,0 +1,27 @@
+name: Verify Navolume Bot authentication
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-app-token:
+    name: Verify GitHub App token
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mint a Navolume Bot installation token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: 4381067
+          private-key: ${{ secrets.NAVOLUME_BOT_PRIVATE_KEY }}
+          owner: navolume
+          repositories: web
+
+      - name: Confirm the authenticated app identity
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh api /app --jq '"Authenticated GitHub App: \(.slug) (ID \(.id))"'
