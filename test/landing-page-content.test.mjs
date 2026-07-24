@@ -87,6 +87,10 @@ test("uses consistent inline SVG theme icons and a custom-styled email field on 
 test("keeps hero controls aligned and gives the two-column hero enough room", () => {
   assert.match(page, /\.actions\{display:grid;grid-template-columns:minmax\(0,480px\) auto;align-items:start/);
   assert.match(page, /\.quiet-link\{margin-top:23px\}/);
+  assert.match(page, /Founding access/);
+  assert.match(page, /Get in before the doors open\./);
+  assert.match(page, /Claim my spot&nbsp; ✦/);
+  assert.match(page, /\.signup\{[^}]*border-radius:18px;[^}]*box-shadow:/);
   assert.match(page, /@media\(max-width:1200px\)\{\.hero\{grid-template-columns:1fr;gap:74px\}/);
   assert.match(page, /\.hero \.product-frame\{max-width:760px;width:100%;margin:auto\}/);
 });
