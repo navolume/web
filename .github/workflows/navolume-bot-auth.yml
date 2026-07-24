@@ -20,8 +20,8 @@ jobs:
           owner: navolume
           repositories: web
 
-      - name: Confirm the authenticated app identity
+      - name: Confirm the bot installation can access Navolume Web
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          gh api /app --jq '"Authenticated GitHub App: \(.slug) (ID \(.id))"'
+          gh api /installation/repositories --jq '"Authenticated installation can access: " + ([.repositories[].full_name] | join(", "))'
