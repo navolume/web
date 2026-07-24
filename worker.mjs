@@ -1,4 +1,7 @@
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const resendEndpoint = "https://api.resend.com/emails";
+const confirmationSubject = "You’re on the Navolume early-access list";
+const confirmationText = "You’re on the Navolume early-access list. We’ll be in touch.";
 
 function json(body, status = 200, headers = {}) {
   return new Response(JSON.stringify(body), {
@@ -8,6 +11,44 @@ function json(body, status = 200, headers = {}) {
       ...headers,
     },
   });
+}
+
+async function sendConfirmation(email, apiKey) {
+  const response = await fetch(resendEndpoint, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "Navolume <hello@navolume.com>",
+      to: [email],
+      subject: confirmationSubject,
+      text: confirmationText,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Resend rejected the confirmation with status ${response.status}`);
+  }
+}
+
+async function needsConfirmation(email, database) {
+  const insert = await database
+    .prepare("INSERT OR IGNORE INTO waitlist_signups (email) VALUES (?)")
+    .bind(email)
+    .run();
+
+  if (insert.meta.changes) {
+    return true;
+  }
+
+  const signup = await database
+    .prepare("SELECT confirmation_sent_at FROM waitlist_signups WHERE email = ?")
+    .bind(email)
+    .first();
+
+  return !signup?.confirmation_sent_at;
 }
 
 async function handleWaitlist(request, env) {
@@ -28,19 +69,20 @@ async function handleWaitlist(request, env) {
   }
 
   try {
-    const result = await env.WAITLIST_DB
-      .prepare("INSERT OR IGNORE INTO waitlist_signups (email) VALUES (?)")
+    if (!await needsConfirmation(email, env.WAITLIST_DB)) {
+      return json({ message: "You’re already on the list. We’ll be in touch." });
+    }
+
+    await sendConfirmation(email, env.RESEND_API_KEY);
+    await env.WAITLIST_DB
+      .prepare("UPDATE waitlist_signups SET confirmation_sent_at = CURRENT_TIMESTAMP WHERE email = ?")
       .bind(email)
       .run();
 
-    return json({
-      message: result.meta.changes
-        ? "You’re on the list. We’ll be in touch."
-        : "You’re already on the list. We’ll be in touch.",
-    });
+    return json({ message: "You’re on the list. Check your inbox to confirm." });
   } catch (error) {
     console.error("Waitlist signup failed", error);
-    return json({ error: "We could not save your email. Please try again." }, 500);
+    return json({ error: "We could not send your confirmation. Please try again." }, 500);
   }
 }
 

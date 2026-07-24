@@ -17,8 +17,9 @@ The landing-page form submits `POST /api/waitlist`. `worker.mjs` stores normaliz
 Before deploying the form, a maintainer must complete these Cloudflare steps:
 
 1. Create the `navolume-waitlist` D1 database in the intended Cloudflare account.
-2. Apply `migrations/0001_waitlist_signups.sql` to that database.
+2. Apply every SQL file in `migrations/` to that database, in numeric order.
 3. Set its non-secret database ID in the `WAITLIST_DB` entry in `wrangler.jsonc`.
-4. Deploy the Worker.
+4. Verify `navolume.com` in Resend and store its API key as the Cloudflare Worker secret `RESEND_API_KEY`.
+5. Deploy the Worker.
 
-The client and Worker both validate email addresses. The database unique constraint means repeat submissions receive a safe success response rather than duplicate rows. Do not commit credentials, API tokens, or other secrets.
+The client and Worker both validate email addresses. The database unique constraint means repeat submissions receive a safe success response rather than duplicate rows. New or previously unconfirmed signups receive one Resend confirmation; a failed send remains eligible for retry. Do not commit credentials, API tokens, or other secrets.
