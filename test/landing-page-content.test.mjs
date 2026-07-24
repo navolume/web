@@ -52,3 +52,16 @@ test("uses consistent inline SVG theme icons and a custom-styled email field on 
   assert.match(page, /\.signup input:focus\{border-color:var\(--lime\);[^}]*box-shadow:0 0 0 4px rgba\(196,255,122,\.12\)/);
   assert.match(page, /\.signup input\{[^}]*font:14px Manrope,Arial,sans-serif/);
 });
+
+test("offers an accessible seller dashboard preview alongside the buyer library", () => {
+  assert.match(page, /class="preview-mode-toggle" role="group" aria-label="Preview mode"/);
+  assert.match(page, /data-preview-mode="buyer"/);
+  assert.match(page, /data-preview-mode="seller"/);
+  assert.match(page, /id="seller-preview" hidden/);
+  assert.match(page, /Seller overview/);
+  assert.match(page, /Total sales/);
+  assert.match(page, /Revenue this month/);
+  assert.match(page, /aria-label="Sales over the last seven days"/);
+  assert.match(page, /previewModeButtons\.forEach/);
+  assert.match(page, /sellerPreview\.hidden = mode !== 'seller'/);
+});
