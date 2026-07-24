@@ -78,6 +78,7 @@ test("stores a normalized waitlist address and sends its confirmation email", as
     to: ["creator@example.com"],
     subject: "You’re on the Navolume early-access list",
     text: "You’re on the Navolume early-access list. We’ll be in touch.",
+    html: `<!doctype html><html lang="en"><body style="margin:0;background:#f7f6f2;color:#17191d;font-family:Arial,sans-serif"><main style="max-width:560px;margin:32px auto;padding:40px;background:#ffffff;border-radius:20px"><p style="margin:0 0 24px;color:#5b5f68;font-size:14px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Navolume</p><h1 style="margin:0 0 16px;font-size:32px;line-height:1.15">You’re on the list.</h1><p style="margin:0;font-size:18px;line-height:1.6">Thanks for joining Navolume early access. We’ll be in touch soon.</p></main></body></html>`,
   });
   assert.ok(WAITLIST_DB.statements.some((sql) => sql.startsWith("UPDATE waitlist_signups SET confirmation_sent_at")));
 });
