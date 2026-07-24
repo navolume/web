@@ -65,11 +65,28 @@ jobs:
           git push --force-with-lease origin "HEAD:refs/heads/$TARGET_BRANCH"
           PR_URL="$(gh pr create --base main --head "$TARGET_BRANCH" --title "$PR_TITLE" --body "$PR_BODY")"
           if [ "$REVIEW_REQUIRED" = "true" ]; then
+            STATUS='Awaiting founder review'
+            NEXT_ACTION='Review and manually merge the pull request when ready. The bot will not auto-merge it.'
             gh issue edit "$ISSUE_NUMBER" --add-label 'bot:needs-review'
-            gh issue comment "$ISSUE_NUMBER" --body "Navolume Bot opened a review-gated PR: $PR_URL"
           else
+            STATUS='Auto-merge enabled'
+            NEXT_ACTION='GitHub will merge the pull request after all required checks pass.'
             gh pr merge "$PR_URL" --auto --squash --delete-branch
             gh issue edit "$ISSUE_NUMBER" --add-label 'bot:fixed'
-            gh issue comment "$ISSUE_NUMBER" --body "Navolume Bot opened an auto-merge PR: $PR_URL"
           fi
+          COMMENT_BODY="$(cat <<EOF
+          ## Navolume Bot update
+
+          **Status:** $STATUS
+          **Pull request:** $PR_URL
+          **Verification:** The promotion workflow completed successfully. Follow the PR for live GitHub and Cloudflare check results.
+
+          ### What changed
+          $PR_BODY
+
+          ### Next action
+          $NEXT_ACTION
+          EOF
+          )"
+          gh issue comment "$ISSUE_NUMBER" --body "$COMMENT_BODY"
           git push origin --delete "$SOURCE_BRANCH" || true
