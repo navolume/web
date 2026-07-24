@@ -24,6 +24,14 @@ test("smoothly transitions theme colors while respecting reduced-motion preferen
   assert.match(page, /classList\.remove\('theme-transitioning'\)/);
 });
 
+test("adds subtle landing-page motion while honoring reduced-motion preferences", () => {
+  assert.match(page, /@keyframes hero-rise\{from\{opacity:0;transform:translateY\(18px\)\}to\{opacity:1;transform:translateY\(0\)\}\}/);
+  assert.match(page, /\.hero>\*\{animation:hero-rise \.7s cubic-bezier\(\.2,\.8,\.2,1\) both\}/);
+  assert.match(page, /\.product-frame\{[^}]*animation:preview-float 6s ease-in-out infinite/);
+  assert.match(page, /\.product-type:hover,\.workflow-step:hover,\.principle:hover\{transform:translateY\(-5px\)/);
+  assert.match(page, /@media\(prefers-reduced-motion:reduce\)\{[^}]*\.hero>\*,\.product-frame\{animation:none/);
+});
+
 test("uses consistent inline SVG theme icons and a custom-styled email field on mobile browsers", () => {
   assert.match(page, /class="theme-icon theme-icon-moon"/);
   assert.match(page, /class="theme-icon theme-icon-sun"/);
