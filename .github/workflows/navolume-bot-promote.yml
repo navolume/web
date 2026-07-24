@@ -20,12 +20,14 @@ jobs:
       COMMIT_MESSAGE: ${{ github.event.client_payload.commit_message }}
       PR_TITLE: ${{ github.event.client_payload.pr_title }}
       PR_BODY: ${{ github.event.client_payload.pr_body }}
+      REVIEW_REQUIRED: ${{ github.event.client_payload.review_required || 'false' }}
     steps:
       - name: Validate the trusted staging-branch payload
         run: |
           case "$SOURCE_BRANCH" in staging/navolume-bot/*) ;; *) echo "Invalid source branch"; exit 1;; esac
           case "$TARGET_BRANCH" in fix/issue-*) ;; *) echo "Invalid target branch"; exit 1;; esac
           case "$ISSUE_NUMBER" in ''|*[!0-9]*) echo "Invalid issue number"; exit 1;; esac
+          case "$REVIEW_REQUIRED" in true|false) ;; *) echo "Invalid review_required value"; exit 1;; esac
           test -n "$COMMIT_MESSAGE" && test -n "$PR_TITLE" && test -n "$PR_BODY"
 
       - name: Mint a Navolume Bot installation token
@@ -62,7 +64,12 @@ jobs:
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/navolume/web.git"
           git push --force-with-lease origin "HEAD:refs/heads/$TARGET_BRANCH"
           PR_URL="$(gh pr create --base main --head "$TARGET_BRANCH" --title "$PR_TITLE" --body "$PR_BODY")"
-          gh pr merge "$PR_URL" --auto --squash --delete-branch
-          gh issue edit "$ISSUE_NUMBER" --add-label 'bot:fixed'
-          gh issue comment "$ISSUE_NUMBER" --body "Navolume Bot opened an auto-merge PR: $PR_URL"
+          if [ "$REVIEW_REQUIRED" = "true" ]; then
+            gh issue edit "$ISSUE_NUMBER" --add-label 'bot:needs-review'
+            gh issue comment "$ISSUE_NUMBER" --body "Navolume Bot opened a review-gated PR: $PR_URL"
+          else
+            gh pr merge "$PR_URL" --auto --squash --delete-branch
+            gh issue edit "$ISSUE_NUMBER" --add-label 'bot:fixed'
+            gh issue comment "$ISSUE_NUMBER" --body "Navolume Bot opened an auto-merge PR: $PR_URL"
+          fi
           git push origin --delete "$SOURCE_BRANCH" || true
