@@ -59,6 +59,11 @@ test("carries the selected site theme into the buyer-library preview", () => {
   assert.match(page, /\.preview-nav\{[^}]*background:var\(--preview-nav\)/);
 });
 
+test("keeps the hero actions inside the single-column tablet layout", () => {
+  assert.match(page, /@media\(max-width:800px\)[^@]*\.actions\{display:block\}/);
+  assert.match(page, /@media\(max-width:800px\)[^@]*\.quiet-link\{margin-top:12px\}/);
+});
+
 test("uses consistent inline SVG theme icons and a custom-styled email field on mobile browsers", () => {
   assert.match(page, /class="theme-icon theme-icon-moon"/);
   assert.match(page, /class="theme-icon theme-icon-sun"/);
