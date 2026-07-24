@@ -17,6 +17,25 @@ test("shows the creator workflow from product to buyer library", () => {
   assert.match(page, /03\s*<\/span><h3>Keep the relationship alive\.<\/h3>/);
 });
 
+test("answers early-access questions with accessible disclosure controls before the final CTA", () => {
+  const faqStart = page.indexOf('<section class="faq"');
+  const ctaStart = page.indexOf('<section class="cta"');
+
+  assert.ok(faqStart > page.indexOf('<section class="statement"'));
+  assert.ok(faqStart < ctaStart);
+  assert.match(page, /<section class="faq" aria-labelledby="faq-title">/);
+  assert.match(page, /<h2 id="faq-title">Questions, answered\.<\/h2>/);
+  assert.equal((page.match(/<details>/g) || []).length, 5);
+  assert.match(page, /<summary>What is Navolume\?<\/summary>/);
+  assert.match(page, /<summary>Who is it for\?<\/summary>/);
+  assert.match(page, /<summary>What can creators sell\?<\/summary>/);
+  assert.match(page, /<summary>What does early access mean\?<\/summary>/);
+  assert.match(page, /<summary>Will I get a confirmation email\?<\/summary>/);
+  assert.match(page, /<details>\s*<summary>What is Navolume\?<\/summary><p>A home for creators to sell digital products and for customers to keep what they buy\.<\/p>\s*<\/details>/);
+  assert.match(page, /\.faq details:focus-within\{[^}]*border-color:var\(--lime\)/);
+  assert.match(page, /\.faq summary:focus-visible\{[^}]*outline:2px solid var\(--lime\)/);
+});
+
 test("smoothly transitions theme colors while respecting reduced-motion preferences", () => {
   assert.match(page, /html\.theme-transitioning,html\.theme-transitioning \*\{transition:background-color \.25s ease,color \.25s ease,border-color \.25s ease,box-shadow \.25s ease\}/);
   assert.match(page, /@media\(prefers-reduced-motion:reduce\)\{html\.theme-transitioning,html\.theme-transitioning \*\{transition:none\}\}/);
