@@ -16,3 +16,10 @@ test("shows the creator workflow from product to buyer library", () => {
   assert.match(page, /02\s*<\/span><h3>Deliver a real home\.<\/h3>/);
   assert.match(page, /03\s*<\/span><h3>Keep the relationship alive\.<\/h3>/);
 });
+
+test("smoothly transitions theme colors while respecting reduced-motion preferences", () => {
+  assert.match(page, /html\.theme-transitioning,html\.theme-transitioning \*\{transition:background-color \.25s ease,color \.25s ease,border-color \.25s ease,box-shadow \.25s ease\}/);
+  assert.match(page, /@media\(prefers-reduced-motion:reduce\)\{html\.theme-transitioning,html\.theme-transitioning \*\{transition:none\}\}/);
+  assert.match(page, /classList\.add\('theme-transitioning'\)/);
+  assert.match(page, /classList\.remove\('theme-transitioning'\)/);
+});
