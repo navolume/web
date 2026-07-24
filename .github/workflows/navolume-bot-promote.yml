@@ -61,7 +61,8 @@ jobs:
           git commit -m "$COMMIT_MESSAGE"
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/navolume/web.git"
           git push --force-with-lease origin "HEAD:refs/heads/$TARGET_BRANCH"
-          gh pr create --base main --head "$TARGET_BRANCH" --title "$PR_TITLE" --body "$PR_BODY"
+          PR_URL="$(gh pr create --base main --head "$TARGET_BRANCH" --title "$PR_TITLE" --body "$PR_BODY")"
+          gh pr merge "$PR_URL" --auto --squash --delete-branch
           gh issue edit "$ISSUE_NUMBER" --add-label 'bot:fixed'
-          gh issue comment "$ISSUE_NUMBER" --body "Navolume Bot opened a fix pull request: $(gh pr view "$TARGET_BRANCH" --json url --jq .url)"
+          gh issue comment "$ISSUE_NUMBER" --body "Navolume Bot opened an auto-merge PR: $PR_URL"
           git push origin --delete "$SOURCE_BRANCH" || true

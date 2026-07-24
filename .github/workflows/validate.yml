@@ -1,0 +1,34 @@
+name: Navolume checks
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-static-site:
+    name: Validate static site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate markup, structured data, and sitemap
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+          import xml.etree.ElementTree as ET
+
+          html = Path('index.html').read_text(encoding='utf-8')
+          assert '<meta name="description"' in html
+          assert '<link rel="canonical" href="https://navolume.com/">' in html
+          match = re.search(r'<script type="application/ld\+json">(.*?)</script>', html)
+          assert match, 'Missing JSON-LD structured data'
+          json.loads(match.group(1))
+          ET.parse('sitemap.xml')
+          for path in ('robots.txt', 'favicon.svg', 'og.png', 'site.webmanifest'):
+              assert Path(path).is_file(), f'Missing {path}'
+          print('Static-site validation passed.')
+          PY
