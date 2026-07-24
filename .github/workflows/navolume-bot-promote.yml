@@ -1,0 +1,67 @@
+name: Navolume Bot promote a vetted fix
+
+on:
+  repository_dispatch:
+    types: [navolume-bot-promote]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  promote:
+    name: Commit and open PR as Navolume Bot
+    runs-on: ubuntu-latest
+    env:
+      SOURCE_BRANCH: ${{ github.event.client_payload.source_branch }}
+      TARGET_BRANCH: ${{ github.event.client_payload.target_branch }}
+      ISSUE_NUMBER: ${{ github.event.client_payload.issue_number }}
+      COMMIT_MESSAGE: ${{ github.event.client_payload.commit_message }}
+      PR_TITLE: ${{ github.event.client_payload.pr_title }}
+      PR_BODY: ${{ github.event.client_payload.pr_body }}
+    steps:
+      - name: Validate the trusted staging-branch payload
+        run: |
+          case "$SOURCE_BRANCH" in staging/navolume-bot/*) ;; *) echo "Invalid source branch"; exit 1;; esac
+          case "$TARGET_BRANCH" in fix/issue-*) ;; *) echo "Invalid target branch"; exit 1;; esac
+          case "$ISSUE_NUMBER" in ''|*[!0-9]*) echo "Invalid issue number"; exit 1;; esac
+          test -n "$COMMIT_MESSAGE" && test -n "$PR_TITLE" && test -n "$PR_BODY"
+
+      - name: Mint a Navolume Bot installation token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: 4381067
+          private-key: ${{ secrets.NAVOLUME_BOT_PRIVATE_KEY }}
+          owner: navolume
+          repositories: web
+          permission-contents: write
+          permission-issues: write
+          permission-pull-requests: write
+
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Promote the vetted patch as Navolume Bot
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          git fetch origin "$SOURCE_BRANCH"
+          git diff --binary origin/main...FETCH_HEAD > /tmp/navolume-bot.patch
+          test -s /tmp/navolume-bot.patch
+          git checkout -B "$TARGET_BRANCH" origin/main
+          git apply --index --binary /tmp/navolume-bot.patch
+          git config user.name 'navolume-bot[bot]'
+          git config user.email '4381067+navolume-bot[bot]@users.noreply.github.com'
+          git commit -m "$COMMIT_MESSAGE"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/navolume/web.git"
+          git push --force-with-lease origin "HEAD:refs/heads/$TARGET_BRANCH"
+          gh pr create --base main --head "$TARGET_BRANCH" --title "$PR_TITLE" --body "$PR_BODY"
+          gh issue edit "$ISSUE_NUMBER" --add-label 'bot:fixed'
+          gh issue comment "$ISSUE_NUMBER" --body "Navolume Bot opened a fix pull request: $(gh pr view "$TARGET_BRANCH" --json url --jq .url)"
+          git push origin --delete "$SOURCE_BRANCH" || true
