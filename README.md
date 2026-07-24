@@ -8,17 +8,17 @@ Marketing site for [Navolume](https://navolume.com): the home for everything cre
 python3 -m http.server 8080
 ```
 
-The project is a static site with a Cloudflare Pages Function for early-access signups.
+The project is a static site served by a Cloudflare Worker. The Worker handles early-access signups at `POST /api/waitlist` and serves the remaining site assets.
 
 ## Waitlist setup (Cloudflare)
 
-The landing-page form submits `POST /api/waitlist`. The function stores normalized email addresses in a Cloudflare D1 database through a binding named `WAITLIST_DB`.
+The landing-page form submits `POST /api/waitlist`. `worker.mjs` stores normalized email addresses in a Cloudflare D1 database through the `WAITLIST_DB` binding configured in `wrangler.jsonc`.
 
 Before deploying the form, a maintainer must complete these Cloudflare steps:
 
-1. Create a D1 database in the intended Cloudflare account.
-2. Apply `migrations/0001_waitlist_signups.sql` to that database (for example, with Wrangler's D1 migration support).
-3. In the Cloudflare Pages project, add a D1 binding named `WAITLIST_DB` that points to the database.
-4. Deploy the Pages project so `functions/api/waitlist.js` is included.
+1. Create the `navolume-waitlist` D1 database in the intended Cloudflare account.
+2. Apply `migrations/0001_waitlist_signups.sql` to that database.
+3. Set its non-secret database ID in the `WAITLIST_DB` entry in `wrangler.jsonc`.
+4. Deploy the Worker.
 
-No credentials, database IDs, or secrets belong in this repository. The client validates email before submitting; the Pages Function validates it again and uses the database's unique constraint so repeat submissions receive a safe success response rather than duplicate rows.
+The client and Worker both validate email addresses. The database unique constraint means repeat submissions receive a safe success response rather than duplicate rows. Do not commit credentials, API tokens, or other secrets.
