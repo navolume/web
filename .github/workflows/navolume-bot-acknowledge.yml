@@ -1,0 +1,43 @@
+name: Navolume Bot acknowledge an issue
+
+on:
+  repository_dispatch:
+    types: [navolume-bot-acknowledge]
+
+permissions:
+  contents: read
+  issues: read
+
+jobs:
+  acknowledge:
+    name: Acknowledge issue as Navolume Bot
+    runs-on: ubuntu-latest
+    env:
+      ISSUE_NUMBER: ${{ github.event.client_payload.issue_number }}
+    steps:
+      - name: Validate issue number
+        run: |
+          case "$ISSUE_NUMBER" in ''|*[!0-9]*) echo "Invalid issue number"; exit 1;; esac
+
+      - name: Mint a Navolume Bot installation token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: 4381067
+          private-key: ${{ secrets.NAVOLUME_BOT_PRIVATE_KEY }}
+          owner: navolume
+          repositories: web
+          permission-issues: write
+
+      - name: Post intake acknowledgment
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --repo navolume/web --body "$(cat <<'EOF'
+          ## Navolume Bot update
+
+          **Status:** Received — reviewing this issue now.
+
+          I’ll follow up here with either a pull request, a review requirement, or a clear blocker.
+          EOF
+          )"
