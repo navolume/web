@@ -32,6 +32,14 @@ test("adds subtle landing-page motion while honoring reduced-motion preferences"
   assert.match(page, /@media\(prefers-reduced-motion:reduce\)\{[^}]*\.hero>\*,\.product-frame\{animation:none/);
 });
 
+test("carries the selected site theme into the buyer-library preview", () => {
+  assert.match(page, /:root\{[^}]*--preview-surface:#10151c;[^}]*--preview-text:#f3f1e9/);
+  assert.match(page, /:root\[data-theme="light"\]\{[^}]*--preview-surface:#e9ede6;[^}]*--preview-text:#1a2520/);
+  assert.match(page, /\.app\{[^}]*background:var\(--preview-surface\);color:var\(--preview-text\)/);
+  assert.match(page, /\.app-top\{[^}]*background:var\(--preview-top\)/);
+  assert.match(page, /\.preview-nav\{[^}]*background:var\(--preview-nav\)/);
+});
+
 test("uses consistent inline SVG theme icons and a custom-styled email field on mobile browsers", () => {
   assert.match(page, /class="theme-icon theme-icon-moon"/);
   assert.match(page, /class="theme-icon theme-icon-sun"/);
