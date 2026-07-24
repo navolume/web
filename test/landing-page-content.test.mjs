@@ -5,6 +5,8 @@ import test from "node:test";
 const page = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
 test("explains what creators can sell and what buyers keep", () => {
+  assert.match(page, /One home for every purchase/);
+  assert.match(page, /A download from Gumroad\. A membership on Patreon\./);
   assert.match(page, /More than a file delivery/);
   assert.match(page, /Templates, presets, courses, guides, downloads, and more/);
   assert.match(page, /latest version, license, and setup notes/);
