@@ -30,5 +30,9 @@ test("uses consistent inline SVG theme icons and a custom-styled email field on 
   assert.doesNotMatch(page, /aria-hidden="true">☾/);
   assert.match(page, /\.theme-icon\{width:16px;height:16px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1\.8\}/);
   assert.match(page, /\.signup input\{[^}]*appearance:none;-webkit-appearance:none;/);
+  assert.match(page, /\.signup input\{[^}]*background:var\(--surface-alt\)/);
+  assert.match(page, /\.signup input\{[^}]*box-shadow:inset 0 1px 0 rgba\(255,255,255,\.05\)/);
+  assert.match(page, /\.signup input::placeholder\{color:var\(--muted\);opacity:1\}/);
+  assert.match(page, /\.signup input:focus\{border-color:var\(--lime\);[^}]*box-shadow:0 0 0 4px rgba\(196,255,122,\.12\)/);
   assert.match(page, /\.signup input\{[^}]*font:14px Manrope,Arial,sans-serif/);
 });
