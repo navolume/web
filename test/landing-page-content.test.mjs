@@ -81,7 +81,7 @@ test("uses consistent inline SVG theme icons and a custom-styled email field on 
   assert.match(page, /\.signup input\{[^}]*box-shadow:inset 0 1px 0 rgba\(255,255,255,\.05\)/);
   assert.match(page, /\.signup input::placeholder\{color:var\(--muted\);opacity:1\}/);
   assert.match(page, /\.signup input:focus\{border-color:var\(--lime\);[^}]*box-shadow:0 0 0 4px rgba\(196,255,122,\.12\)/);
-  assert.match(page, /\.signup input\{[^}]*font:14px Inter,Arial,sans-serif/);
+  assert.match(page, /\*\{font-family:Arial,Helvetica,sans-serif!important\}/);
 });
 
 test("stacks the how-it-works action below the early-access box at matching width", () => {
