@@ -85,7 +85,7 @@ test("uses consistent inline SVG theme icons and a custom-styled email field on 
 });
 
 test("stacks the how-it-works action below the early-access box at matching width", () => {
-  assert.match(page, /\.actions\{display:flex;flex-direction:column;align-items:stretch;gap:15px/);
+  assert.match(page, /\.actions\{display:flex;flex-direction:column;align-items:stretch;width:100%;max-width:480px;gap:15px/);
   assert.match(page, /\.signup\{[^}]*width:100%;/);
   assert.match(page, /\.quiet-link\{display:block;width:100%;margin-top:0/);
 });
