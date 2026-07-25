@@ -84,9 +84,14 @@ test("uses consistent inline SVG theme icons and a custom-styled email field on 
   assert.match(page, /\.signup input\{[^}]*font:14px Manrope,Arial,sans-serif/);
 });
 
-test("keeps hero controls aligned and gives the two-column hero enough room", () => {
-  assert.match(page, /\.actions\{display:grid;grid-template-columns:minmax\(0,480px\) auto;align-items:center/);
-  assert.match(page, /\.quiet-link\{margin-top:0\}/);
+test("stacks the how-it-works action below the early-access box at matching width", () => {
+  assert.match(page, /\.actions\{display:flex;flex-direction:column;align-items:stretch;gap:15px/);
+  assert.match(page, /\.signup\{[^}]*width:100%;/);
+  assert.match(page, /\.quiet-link\{display:block;width:100%;margin-top:0/);
+});
+
+test("keeps the hero signup content polished and gives the two-column hero enough room", () => {
+  assert.match(page, /\.quiet-link\{display:block;width:100%;margin-top:0/);
   assert.match(page, /Founding access/);
   assert.match(page, /Get in before the doors open\./);
   assert.match(page, /Claim my spot&nbsp; ✦/);
